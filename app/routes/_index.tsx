@@ -19,7 +19,10 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   return (
     <>
-      <div className="p-4 border-b-border border-b w-full flex justify-between">
+      <div className="p-4 border-b-border border-b flex items-center">
+        <Typography variant="largeText" className="mr-8 text-primary">
+          Kifu.io
+        </Typography>
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -38,14 +41,17 @@ export default function Index() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <Link to="/login" className={navigationMenuTriggerStyle()}>
+        <Link
+          to="/login"
+          className={navigationMenuTriggerStyle({ className: "ml-auto" })}
+        >
           Login
         </Link>
       </div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <Typography variant="h1" className="mt-12">
-            Kifu.io
+            Welcome to Kifu.io
           </Typography>
         </div>
       </div>
