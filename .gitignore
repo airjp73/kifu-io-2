@@ -4,4 +4,4 @@ node_modules
 /build
 /public/build
 .env
-app/goban/parse/grammar.ts
+app/goban/sgf/grammar.ts
