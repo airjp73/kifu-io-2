@@ -2,8 +2,10 @@ import grammar from "./grammar";
 import nearley from "nearley";
 import type { GameTreeNode, PropertyNode } from "./nodes";
 
+export type SgfId = number;
+
 export type SgfNode = {
-  id: number;
+  id: SgfId;
   data: Record<string, string[]>;
   parentId: number | null;
   children: SgfNode[];

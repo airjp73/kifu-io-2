@@ -1,4 +1,4 @@
-import type { BoardState, GameState } from "./types";
+import type { BoardState, GameState } from "../types";
 
 /**
  * A test helper to allow for creating board states for tests in a visual way.

@@ -1,4 +1,4 @@
-import type { SgfNode } from "../sgf/parse";
+import type { SgfNode } from "../../sgf/parse";
 import { handleCaptures } from "./boardLogic";
 import type {
   GameState,
@@ -6,7 +6,7 @@ import type {
   PlayedOnDates,
   PositionStatus,
   StoneColor,
-} from "./types";
+} from "../types";
 import { z } from "zod";
 
 const onlyOne = <T extends z.ZodSchema<any>>(zod: T) =>
