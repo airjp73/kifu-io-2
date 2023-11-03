@@ -9,8 +9,14 @@ import snapshot7 from "../snapshots/snapshot7";
 import snapshot8 from "../snapshots/snapshot8";
 import { parseSgf } from "../sgf/parse";
 import { createStringFromGameState } from "./boardState/boardStateTestHelpers";
+import type { GobanState } from "./gobanState/state";
 import { makeGobanState } from "./gobanState/state";
-import { hasMoreMoves, nextMove } from "./gobanState/mutations";
+import {
+  hasMoreMoves,
+  isAtStart,
+  nextMove,
+  prevMove,
+} from "./gobanState/updates";
 
 const allSnapshots = [
   "(;FF[4]GM[1]SZ[19];B[aa];W[bb])",
@@ -28,13 +34,12 @@ const allSnapshots = [
 describe("GameState", () => {
   it.each(allSnapshots)("should process game state", (snap) => {
     const sgf = parseSgf(snap);
-    const state = makeGobanState(sgf);
-
+    let state = makeGobanState(sgf);
     let i = 0;
 
     const doSnapshot = (move: number) => {
       for (; i < move && hasMoreMoves(state); i++) {
-        nextMove(state);
+        state = nextMove(state);
       }
       expect(
         `Move: ${i}\n` + createStringFromGameState(state.gameState)
@@ -44,6 +49,32 @@ describe("GameState", () => {
     for (let target = 50; i === target - 50; target += 50) {
       doSnapshot(target);
       if (i < target) return;
+    }
+  });
+
+  it.each(allSnapshots)("should process game state in reverse", (snap) => {
+    const sgf = parseSgf(snap);
+    let state = makeGobanState(sgf);
+    const intermediate: GobanState[] = [];
+
+    let i = 0;
+    for (; hasMoreMoves(state); i++) {
+      state = nextMove(state);
+      if (i % 34 === 0) {
+        intermediate.push(state);
+      }
+    }
+
+    // above for loop naturally overshoots by 1
+    i--;
+    for (; !isAtStart(state) && i >= 0; i--) {
+      if (i % 34 === 0) {
+        expect(
+          `Move: ${i}\n` +
+            createStringFromGameState(intermediate.pop()!.gameState!)
+        ).toEqual(`Move: ${i}\n` + createStringFromGameState(state.gameState));
+      }
+      state = prevMove(state);
     }
   });
 });
