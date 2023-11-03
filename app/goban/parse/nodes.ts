@@ -12,15 +12,12 @@ export type GameTreeNode = {
   subTrees: GameTreeNode[];
 };
 
-export const PropIdent = (nodes: any[]) => nodes[0].join("");
-
-export const PropValue = (nodes: any[]) => nodes[1];
-
-export const Text = (nodes: any[]) => nodes[0].join("");
-
 export const Property = (nodes: any[]): PropertyNode => {
   const [ident, values] = nodes;
-  return { ident, values: values.map((val: any) => val[1]) };
+  return {
+    ident: ident.value,
+    values: values.map((val: any) => val[1].value.slice(1, -1)),
+  };
 };
 
 export const Node = (nodes: any[]): NodeNode => {

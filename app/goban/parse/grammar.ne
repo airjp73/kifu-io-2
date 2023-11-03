@@ -2,33 +2,24 @@
 
 @{%
   import * as nodes from './nodes';
+  import { lexer } from './lexer';
 %}
+
+@lexer lexer
 
 Collection -> (_ GameTree):+ _
   {% nodes.Collection %}
 
-GameTree -> "(" _ Sequence (_ GameTree):* _ ")"
+GameTree -> %lparen _ Sequence (_ GameTree):* _ %rparen
   {% nodes.GameTree %}
 
 Sequence -> (_ Node):+
   {% nodes.Sequence %}
 
-Node -> ";" (_ Property):*
+Node -> %semi (_ Property):*
   {% nodes.Node %}
 
-Property -> PropIdent (_ PropValue):+
+Property -> %propIdent (_ %propValue):+
   {% nodes.Property %}
 
-PropIdent -> UcLetter:+
-  {% nodes.PropIdent %}
-
-PropValue -> "[" Text:? "]"
-  {% nodes.PropValue %}
-
-UcLetter -> [A-Z]
-  {% id %}
-
-Text -> ([^\]] | "\\]"):+
-  {% nodes.Text %}
-
-_ -> [ \t\n\r]:*
+_ -> %ws:?
