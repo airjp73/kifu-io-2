@@ -7,6 +7,7 @@ import snapshot3 from "../snapshots/snapshot3";
 import snapshot5 from "../snapshots/snapshot5";
 import snapshot6 from "../snapshots/snapshot6";
 import snapshot7 from "../snapshots/snapshot7";
+import snapshot8 from "../snapshots/snapshot8";
 
 const allSnapshots = [
   "(;FF[4]GM[1]SZ[19];B[aa];W[bb])",
@@ -18,6 +19,7 @@ const allSnapshots = [
   snapshot5,
   snapshot6,
   snapshot7,
+  snapshot8,
 ];
 
 describe("parse", () => {
