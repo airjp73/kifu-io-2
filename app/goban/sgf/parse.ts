@@ -4,10 +4,13 @@ import type { GameTreeNode, PropertyNode } from "./nodes";
 
 export type SgfId = number;
 
-export type SgfNode = {
+export type SgfNodeInfo = {
   id: SgfId;
   data: Record<string, string[]>;
   parentId: number | null;
+};
+
+export type SgfNode = SgfNodeInfo & {
   children: SgfNode[];
 };
 

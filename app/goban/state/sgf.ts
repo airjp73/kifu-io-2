@@ -1,22 +1,25 @@
-import type { SgfNode } from "../sgf/parse";
+import type { SgfId, SgfNode, SgfNodeInfo } from "../sgf/parse";
 
 export type Sgf = SgfNode[];
 
 export type NormalizedSgf = {
-  [key: number]: {
-    id: number;
-    data: Record<string, string[]>;
-    parentId: number | null;
-    children: number[];
+  nodes: {
+    [key: SgfId]: SgfNodeInfo & {
+      children: number[];
+    };
   };
+  root: SgfId[];
 };
 
 export const normalizeSgf = (sgf: Sgf): NormalizedSgf => {
-  const normalizedSgf: NormalizedSgf = {};
+  const normalizedSgf: NormalizedSgf = {
+    nodes: {},
+    root: sgf.map((node) => node.id),
+  };
 
   const normalizeNode = (node: SgfNode): number => {
     const id = node.id;
-    normalizedSgf[id] = {
+    normalizedSgf.nodes[id] = {
       id,
       data: node.data,
       parentId: node.parentId,
@@ -32,7 +35,7 @@ export const normalizeSgf = (sgf: Sgf): NormalizedSgf => {
 
 export const denormalizeSgf = (normalizedSgf: NormalizedSgf): Sgf => {
   const denormalizeNode = (id: number): SgfNode => {
-    const normalizedNode = normalizedSgf[id];
+    const normalizedNode = normalizedSgf.nodes[id];
     const children = normalizedNode.children.map(denormalizeNode);
     const node: SgfNode = {
       id: normalizedNode.id,
@@ -43,9 +46,7 @@ export const denormalizeSgf = (normalizedSgf: NormalizedSgf): Sgf => {
     return node;
   };
 
-  const nodes = Object.values(normalizedSgf)
-    .filter((node) => node.parentId === null)
-    .map((rootNode) => denormalizeNode(rootNode.id));
+  const nodes = normalizedSgf.root.map((rootNode) => denormalizeNode(rootNode));
 
   return nodes;
 };

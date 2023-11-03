@@ -1,4 +1,4 @@
-import type { SgfNode } from "../../sgf/parse";
+import type { SgfNodeInfo } from "../../sgf/parse";
 import { handleCaptures } from "./boardLogic";
 import type {
   GameState,
@@ -18,7 +18,7 @@ const onlyOne = <T extends z.ZodSchema<any>>(zod: T) =>
 const singleNumber = onlyOne(z.coerce.number());
 const point = z.string().regex(/^[a-zA-Z]{2}$/i);
 
-export const processMove = (gameState: GameState, node: SgfNode) => {
+export const processMove = (gameState: GameState, node: SgfNodeInfo) => {
   gameState.moveState = {
     lines: [],
     validationErrors: [],
@@ -278,7 +278,10 @@ const setTimeLimit = (gameState: GameState, value: string[]) => {
   }
 };
 
-const performAdditionalValidations = (gameState: GameState, node: SgfNode) => {
+const performAdditionalValidations = (
+  gameState: GameState,
+  node: SgfNodeInfo
+) => {
   if (
     (node.data.AB || node.data.AE || node.data.AW || node.data.PL) &&
     (node.data.B || node.data.KO || node.data.MN || node.data.W)

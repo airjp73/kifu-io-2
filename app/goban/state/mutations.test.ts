@@ -8,9 +8,9 @@ import snapshot6 from "../snapshots/snapshot6";
 import snapshot7 from "../snapshots/snapshot7";
 import snapshot8 from "../snapshots/snapshot8";
 import { parseSgf } from "../sgf/parse";
-import { makeGameState } from "./boardState/state";
-import { processMove } from "./boardState/mutations";
 import { createStringFromGameState } from "./boardState/boardStateTestHelpers";
+import { makeGobanState } from "./gobanState/state";
+import { hasMoreMoves, nextMove } from "./gobanState/mutations";
 
 const allSnapshots = [
   "(;FF[4]GM[1]SZ[19];B[aa];W[bb])",
@@ -28,18 +28,16 @@ const allSnapshots = [
 describe("GameState", () => {
   it.each(allSnapshots)("should process game state", (snap) => {
     const sgf = parseSgf(snap);
-    const state = makeGameState();
+    const state = makeGobanState(sgf);
 
-    let current = sgf[0];
     let i = 0;
 
     const doSnapshot = (move: number) => {
-      for (; i < move && !!current; i++) {
-        processMove(state, current);
-        current = current.children[0];
+      for (; i < move && hasMoreMoves(state); i++) {
+        nextMove(state);
       }
       expect(
-        `Move: ${i}\n` + createStringFromGameState(state)
+        `Move: ${i}\n` + createStringFromGameState(state.gameState)
       ).toMatchSnapshot();
     };
 
