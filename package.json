@@ -8,7 +8,7 @@
     "dev": "remix dev --manual",
     "start": "remix-serve ./build/index.js",
     "typecheck": "tsc",
-    "compile-grammar": "nearleyc app/goban/parse/grammar.ne -o app/goban/parse/grammar.ts",
+    "compile-grammar": "nearleyc app/goban/sgf/grammar.ne -o app/goban/sgf/grammar.ts",
     "comp": "bunx shadcn-ui@latest add",
     "vitest": "vitest"
   },
