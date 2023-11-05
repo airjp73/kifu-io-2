@@ -2,28 +2,11 @@ import type { DataFunctionArgs } from "@remix-run/node";
 import { renderToString } from "react-dom/server";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { parseSgf } from "~/goban/sgf/parse";
-import snapshot8 from "~/goban/snapshots/snapshot8";
-import { makeGobanState } from "~/goban/state/gobanState/state";
-import { hasMoreMoves, nextMove } from "~/goban/state/gobanState/updates";
 import type { StoneColor } from "~/goban/state/types";
 
 const searchSchema = zfd.formData({
   color: z.string(),
 });
-
-const getGameState = (game: string) => {
-  const sgf = parseSgf(game);
-  let state = makeGobanState(sgf);
-
-  while (hasMoreMoves(state)) {
-    state = nextMove(state);
-  }
-
-  return state;
-};
-
-const state = getGameState(snapshot8);
 
 const makeSvg = (x: number, y: number, stone: StoneColor | null) =>
   renderToString(
@@ -59,20 +42,28 @@ const makeSvg = (x: number, y: number, stone: StoneColor | null) =>
   );
 
 const cache = {
-  upperLeft: makeSvg(0, 0, state.gameState.boardState.a1),
-  lowerLeft: makeSvg(0, 18, state.gameState.boardState.a19),
-  upperRight: makeSvg(18, 0, state.gameState.boardState.s1),
-  lowerRight: makeSvg(18, 18, state.gameState.boardState.s19),
+  black_upperLeft: makeSvg(0, 0, "b"),
+  black_lowerLeft: makeSvg(0, 18, "b"),
+  black_upperRight: makeSvg(18, 0, "b"),
+  black_lowerRight: makeSvg(18, 18, "b"),
   black_top: makeSvg(9, 0, "b"),
   black_left: makeSvg(0, 9, "b"),
   black_right: makeSvg(18, 9, "b"),
   black_bottom: makeSvg(9, 18, "b"),
   black_center: makeSvg(9, 9, "b"),
+  white_upperLeft: makeSvg(0, 0, "w"),
+  white_lowerLeft: makeSvg(0, 18, "w"),
+  white_upperRight: makeSvg(18, 0, "w"),
+  white_lowerRight: makeSvg(18, 18, "w"),
   white_top: makeSvg(9, 0, "w"),
   white_left: makeSvg(0, 9, "w"),
   white_right: makeSvg(18, 9, "w"),
   white_bottom: makeSvg(9, 18, "w"),
   white_center: makeSvg(9, 9, "w"),
+  empty_upperLeft: makeSvg(0, 0, null),
+  empty_lowerLeft: makeSvg(0, 18, null),
+  empty_upperRight: makeSvg(18, 0, null),
+  empty_lowerRight: makeSvg(18, 18, null),
   empty_top: makeSvg(9, 0, null),
   empty_left: makeSvg(0, 9, null),
   empty_right: makeSvg(18, 9, null),

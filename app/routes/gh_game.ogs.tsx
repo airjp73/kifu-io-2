@@ -77,10 +77,10 @@ export default function OgsGame() {
 
   const getCacheKey = (x: number, y: number, stone?: StoneColor) => {
     const color = stone === "b" ? "black" : stone === "w" ? "white" : "empty";
-    if (x === 0 && y === 0) return "upperLeft";
-    if (x === 0 && y === 18) return "lowerLeft";
-    if (x === 18 && y === 0) return "upperRight";
-    if (x === 18 && y === 18) return "lowerRight";
+    if (x === 0 && y === 0) return `${color}_upperLeft`;
+    if (x === 0 && y === 18) return `${color}_lowerLeft`;
+    if (x === 18 && y === 0) return `${color}_upperRight`;
+    if (x === 18 && y === 18) return `${color}_lowerRight`;
     if (x === 0) return `${color}_left`;
     if (x === 18) return `${color}_right`;
     if (y === 0) return `${color}_top`;
