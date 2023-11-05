@@ -6,6 +6,7 @@ import { parseSgf } from "~/goban/sgf/parse";
 import snapshot8 from "~/goban/snapshots/snapshot8";
 import { makeGobanState } from "~/goban/state/gobanState/state";
 import { hasMoreMoves, nextMove } from "~/goban/state/gobanState/updates";
+import type { StoneColor } from "~/goban/state/types";
 
 const searchSchema = zfd.formData({
   point: z
@@ -25,15 +26,11 @@ const getGameState = (game: string) => {
 
   return state;
 };
+
 const state = getGameState(snapshot8);
 
-export const loader = ({ request }: DataFunctionArgs) => {
-  const { point } = searchSchema.parse(new URL(request.url).searchParams);
-
-  const [x, y] = point.split("").map((c) => c.charCodeAt(0) - 97);
-  const stone = state.gameState.boardState[point];
-
-  const content = renderToString(
+const makeSvg = (x: number, y: number, stone: StoneColor | null) =>
+  renderToString(
     <svg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
       <rect height={100} width={100} fill="#DDBB83" />
       <line
@@ -64,6 +61,56 @@ export const loader = ({ request }: DataFunctionArgs) => {
       )}
     </svg>
   );
+
+const cache = {
+  upperLeft: makeSvg(0, 0, state.gameState.boardState.a1),
+  lowerLeft: makeSvg(0, 18, state.gameState.boardState.a19),
+  upperRight: makeSvg(18, 0, state.gameState.boardState.s1),
+  lowerRight: makeSvg(18, 18, state.gameState.boardState.s19),
+  black: {
+    top: makeSvg(9, 0, "b"),
+    left: makeSvg(0, 9, "b"),
+    right: makeSvg(18, 9, "b"),
+    bottom: makeSvg(9, 18, "b"),
+    center: makeSvg(9, 9, "b"),
+  },
+  white: {
+    top: makeSvg(9, 0, "w"),
+    left: makeSvg(0, 9, "w"),
+    right: makeSvg(18, 9, "w"),
+    bottom: makeSvg(9, 18, "w"),
+    center: makeSvg(9, 9, "w"),
+  },
+  empty: {
+    top: makeSvg(9, 0, null),
+    left: makeSvg(0, 9, null),
+    right: makeSvg(18, 9, null),
+    bottom: makeSvg(9, 18, null),
+    center: makeSvg(9, 9, null),
+  },
+};
+
+export const loader = ({ request }: DataFunctionArgs) => {
+  const { point } = searchSchema.parse(new URL(request.url).searchParams);
+  const [x, y] = point.split("").map((c) => c.charCodeAt(0) - 97);
+
+  const stone = state.gameState.boardState[point];
+
+  const getCache = () => {
+    if (x === 0 && y === 0) return cache.upperLeft;
+    if (x === 0 && y === 18) return cache.lowerLeft;
+    if (x === 18 && y === 0) return cache.upperRight;
+    if (x === 18 && y === 18) return cache.lowerRight;
+
+    const color = stone === "b" ? "black" : stone === "w" ? "white" : "empty";
+    if (x === 0) return cache[color].left;
+    if (x === 18) return cache[color].right;
+    if (y === 0) return cache[color].top;
+    if (y === 18) return cache[color].bottom;
+    return cache[color].center;
+  };
+
+  const content = getCache();
 
   return new Response(content, {
     headers: {
