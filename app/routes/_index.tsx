@@ -1,6 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { Typography } from "~/ui/Typography";
+import { Typography } from "~/ui/typography";
 import {
   NavigationMenu,
   NavigationMenuItem,
