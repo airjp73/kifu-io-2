@@ -85,7 +85,7 @@ export const loader = ({ request, params }: DataFunctionArgs) => {
   return new Response(cache[color as keyof typeof cache], {
     headers: {
       "content-type": "image/svg+xml",
-      "Cache-Control": "public, max-age: 604800, immutable",
+      "Cache-Control": "public, max-age=604800, immutable",
     },
   });
 };
