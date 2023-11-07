@@ -3,10 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    OGS_CLIENT_ID: z.string(),
-    OGS_CLIENT_SECRET: z.string(),
-    OGS_PASSWORD: z.string(),
-    OGS_USERNAME: z.string(),
+    AI_MOVE_SECRET: z.string(),
+    GH_API_TOKEN: z.string(),
+    SERVER_LOCATION: z.string(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
