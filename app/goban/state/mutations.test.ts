@@ -7,16 +7,19 @@ import snapshot5 from "../snapshots/snapshot5";
 import snapshot6 from "../snapshots/snapshot6";
 import snapshot7 from "../snapshots/snapshot7";
 import snapshot8 from "../snapshots/snapshot8";
-import { parseSgf } from "../sgf/parse";
+import { parseSgf, toSgf } from "../sgf/parse";
 import { createStringFromGameState } from "./boardState/boardStateTestHelpers";
 import type { GobanState } from "./gobanState/state";
 import { makeGobanState } from "./gobanState/state";
 import {
   hasMoreMoves,
   isAtStart,
+  isLegalMove,
   nextMove,
+  playMove,
   prevMove,
 } from "./gobanState/updates";
+import { denormalizeSgf } from "./sgf";
 
 const allSnapshots = [
   "(;FF[4]GM[1]SZ[19];B[aa];W[bb])",
@@ -76,5 +79,41 @@ describe("GameState", () => {
       }
       state = prevMove(state);
     }
+  });
+
+  it("should play a move", () => {
+    const sgf = parseSgf(`(;FF[4]GM[1]SZ[19];B[aa];W[bb])`);
+    let state = makeGobanState(sgf);
+    while (hasMoreMoves(state)) state = nextMove(state);
+    state = playMove(state, "cc", "b");
+    state = playMove(state, "dd", "w");
+    expect(toSgf(denormalizeSgf(state.sgf))).toMatchInlineSnapshot(`
+      "(;FF[4]GM[1]SZ[19]
+      ;B[aa]
+      ;W[bb]
+      ;B[cc]
+      ;W[dd])"
+    `);
+  });
+
+  it("should self capture or occupied spaces as illegal", () => {
+    const sgf = parseSgf(`(;FF[4]GM[1]SZ[19];B[ab];B[bb];B[ca];W[aa])`);
+    let state = makeGobanState(sgf);
+    while (hasMoreMoves(state)) state = nextMove(state);
+    expect(isLegalMove(state, "ba", "b")).toBe(true);
+    expect(isLegalMove(state, "ba", "w")).toBe(false);
+    expect(isLegalMove(state, "aa", "b")).toBe(false);
+    expect(isLegalMove(state, "aa", "b")).toBe(false);
+  });
+
+  it.only("should identify ko as illegal", () => {
+    const sgf = parseSgf(`(;FF[4]GM[1]SZ[19];B[ab];B[ba];W[bb];W[ca])`);
+    let state = makeGobanState(sgf);
+    while (hasMoreMoves(state)) state = nextMove(state);
+    expect(isLegalMove(state, "aa", "b")).toBe(true);
+    expect(isLegalMove(state, "aa", "w")).toBe(true);
+    state = playMove(state, "aa", "w");
+    expect(isLegalMove(state, "ba", "w")).toBe(true);
+    expect(isLegalMove(state, "ba", "b")).toBe(false);
   });
 });

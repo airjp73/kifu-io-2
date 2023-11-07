@@ -1,6 +1,8 @@
 import type { GobanState } from "./state";
 import * as board from "../boardState/mutations";
 import { produce } from "immer";
+import type { BoardState, StoneColor } from "../types";
+import type { NormalizedSgfNode } from "../sgf";
 
 export const hasMoreMoves = (state: GobanState) => {
   return (
@@ -10,6 +12,35 @@ export const hasMoreMoves = (state: GobanState) => {
 
 export const isAtStart = (state: GobanState) => {
   return !state.currentMove;
+};
+
+const areBoardStatesEqual = (a: BoardState, b: BoardState) => {
+  if (Object.keys(a).length !== Object.keys(b).length) return false;
+  for (const key in a) {
+    if (a[key] !== b[key]) return false;
+  }
+  return true;
+};
+
+export const isLegalMove = (
+  state: GobanState,
+  point: string,
+  color: StoneColor
+) => {
+  if (state.gameState.boardState[point] != null) return false;
+  const nextState = playMove(state, point, color);
+
+  // Self-capture
+  if (!nextState.gameState.boardState[point]) return false;
+  // Ko
+  const isRepeatPosition = [...nextState.history]
+    .reverse()
+    .some((historical) =>
+      areBoardStatesEqual(historical.boardState, nextState.gameState.boardState)
+    );
+  if (isRepeatPosition) return false;
+
+  return true;
 };
 
 export const nextMove = (state: GobanState, variation = 0): GobanState => {
@@ -39,5 +70,34 @@ export const prevMove = (state: GobanState): GobanState => {
     currentMove: state.sgf.nodes[state.currentMove!].parentId,
     gameState: state.history[state.history.length - 1],
     history: state.history.slice(0, -1),
+  };
+};
+
+export const playMove = (
+  state: GobanState,
+  point: string,
+  color: StoneColor
+): GobanState => {
+  const nextId = Math.max(...Object.keys(state.sgf.nodes).map(Number)) + 1;
+  const nextNode: NormalizedSgfNode = {
+    id: nextId,
+    children: [],
+    data: color === "b" ? { B: [point] } : { W: [point] },
+    parentId: state.currentMove,
+  };
+
+  return {
+    ...state,
+    currentMove: nextId,
+    gameState: produce(state.gameState, (draft) =>
+      board.processMove(draft, nextNode)
+    ),
+    history: [...state.history, state.gameState],
+    sgf: produce(state.sgf, (draft) => {
+      if (nextNode.parentId)
+        draft.nodes[nextNode.parentId].children.push(nextId);
+      else draft.root.push(nextId);
+      draft.nodes[nextId] = nextNode;
+    }),
   };
 };

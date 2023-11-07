@@ -2,12 +2,12 @@ import type { SgfId, SgfNode, SgfNodeInfo } from "../sgf/parse";
 
 export type Sgf = SgfNode[];
 
+export type NormalizedSgfNode = SgfNodeInfo & {
+  children: number[];
+};
+
 export type NormalizedSgf = {
-  nodes: {
-    [key: SgfId]: SgfNodeInfo & {
-      children: number[];
-    };
-  };
+  nodes: { [key: SgfId]: NormalizedSgfNode };
   root: SgfId[];
 };
 
