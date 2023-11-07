@@ -47,7 +47,6 @@ export function prerenderGoban(state: GobanState) {
     [16, 10],
     [16, 16],
   ];
-  console.log(state.gameState.boardState);
 
   return renderToString(
     <svg
