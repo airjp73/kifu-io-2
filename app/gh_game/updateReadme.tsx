@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { octokit } from "./octokit";
 import { renderToString } from "react-dom/server";
+import type { MoveLegality } from "~/goban/state/gobanState/updates";
 
 export const getGhSgf = async () => {
   const res = await octokit.request(
@@ -44,7 +45,7 @@ export const updateBoardSvg = async (svg: string) => {
   return res.data;
 };
 
-export const updateValidMoves = async (moves: string[][]) => {
+export const updateValidMoves = async (moves: MoveLegality[][]) => {
   const existingResponse = await octokit.request(
     `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
       "README.md"
@@ -60,26 +61,81 @@ export const updateValidMoves = async (moves: string[][]) => {
     "base64"
   ).toString("utf-8");
 
-  const A = "a".charCodeAt(0);
+  const A = "A".charCodeAt(0);
+
+  const renderCell = (move: MoveLegality) => {
+    switch (move) {
+      case "ko":
+        return "⭕️";
+      case "legal":
+        return "";
+      case "occupied-black":
+        return "⚫️";
+      case "occupied-white":
+        return "⚪️";
+      case "suicide":
+        return "💀";
+    }
+  };
 
   const moveList = renderToString(
     <details>
       <summary>Make a move</summary>
       <table>
+        <caption>Key</caption>
+        <tr>
+          <td>A1, B2, C3, etc...</td>
+          <td>Valid move (click to make a move)</td>
+        </tr>
+        <tr>
+          <td>⚫️</td>
+          <td>Occupied by Black</td>
+        </tr>
+        <tr>
+          <td>⚪️</td>
+          <td>Occupied by White</td>
+        </tr>
+        <tr>
+          <td>⭕️</td>
+          <td>Illegal move due to [Ko](https://senseis.xmp.net/?Ko)</td>
+        </tr>
+        <tr>
+          <td>💀</td>
+          <td>
+            Illegal move due to [self-capture](https://senseis.xmp.net/?Suicide){" "}
+          </td>
+        </tr>
+      </table>
+
+      <table>
+        <caption>Choose a spot to move</caption>
         <tr>
           <td></td>
           {Array.from({ length: 19 }).map((_, i) => (
             <td key={i}>{i + 1}</td>
           ))}
         </tr>
-        {moves.map((row, i) => (
-          <tr key={i}>
-            <td>{String.fromCharCode(i + A + (i >= 8 ? 1 : 0))}</td>
-            {row.map((move, i) => (
-              <td key={i}>{move ? "⭕️️" : "🟢"}</td>
-            ))}
-          </tr>
-        ))}
+        {moves.map((row, y) => {
+          const letter = String.fromCharCode(y + A + (y >= 8 ? 1 : 0));
+          return (
+            <tr key={y}>
+              <td>{letter}</td>
+              {row.map((move, x) => {
+                const content = renderCell(move);
+                if (move === "legal")
+                  return (
+                    <td key={x}>
+                      <a href={`#${letter}${x}`}>
+                        {letter}
+                        {x}
+                      </a>
+                    </td>
+                  );
+                return <td key={x}>{content}</td>;
+              })}
+            </tr>
+          );
+        })}
       </table>
     </details>
   );
