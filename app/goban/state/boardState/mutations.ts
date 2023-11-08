@@ -47,6 +47,7 @@ const placeStone = (
 ) => {
   setPoint(gameState, value, color);
   value.forEach((val) => handleCaptures(val, gameState));
+  setPlayerToPlay(gameState, [color === "b" ? "w" : "b"]);
 };
 
 const setPoint = (

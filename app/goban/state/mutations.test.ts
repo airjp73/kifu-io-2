@@ -14,7 +14,7 @@ import { makeGobanState } from "./gobanState/state";
 import {
   hasMoreMoves,
   isAtStart,
-  isLegalMove,
+  getMoveLegality,
   nextMove,
   playMove,
   prevMove,
@@ -100,20 +100,20 @@ describe("GameState", () => {
     const sgf = parseSgf(`(;FF[4]GM[1]SZ[19];B[ab];B[bb];B[ca];W[aa])`);
     let state = makeGobanState(sgf);
     while (hasMoreMoves(state)) state = nextMove(state);
-    expect(isLegalMove(state, "ba", "b")).toBe(true);
-    expect(isLegalMove(state, "ba", "w")).toBe(false);
-    expect(isLegalMove(state, "aa", "b")).toBe(false);
-    expect(isLegalMove(state, "aa", "b")).toBe(false);
+    expect(getMoveLegality(state, "ba", "b")).toBe("legal");
+    expect(getMoveLegality(state, "ba", "w")).toBe("suicide");
+    expect(getMoveLegality(state, "aa", "b")).toBe("occupied-white");
+    expect(getMoveLegality(state, "aa", "w")).toBe("occupied-white");
   });
 
-  it.only("should identify ko as illegal", () => {
+  it("should identify ko as illegal", () => {
     const sgf = parseSgf(`(;FF[4]GM[1]SZ[19];B[ab];B[ba];W[bb];W[ca])`);
     let state = makeGobanState(sgf);
     while (hasMoreMoves(state)) state = nextMove(state);
-    expect(isLegalMove(state, "aa", "b")).toBe(true);
-    expect(isLegalMove(state, "aa", "w")).toBe(true);
+    expect(getMoveLegality(state, "aa", "b")).toBe("legal");
+    expect(getMoveLegality(state, "aa", "w")).toBe("legal");
     state = playMove(state, "aa", "w");
-    expect(isLegalMove(state, "ba", "w")).toBe(true);
-    expect(isLegalMove(state, "ba", "b")).toBe(false);
+    expect(getMoveLegality(state, "ba", "w")).toBe("legal");
+    expect(getMoveLegality(state, "ba", "b")).toBe("ko");
   });
 });

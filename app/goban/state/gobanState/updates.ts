@@ -22,25 +22,33 @@ const areBoardStatesEqual = (a: BoardState, b: BoardState) => {
   return true;
 };
 
-export const isLegalMove = (
+export type MoveLegality =
+  | "occupied-black"
+  | "occupied-white"
+  | "ko"
+  | "suicide"
+  | "legal";
+
+export const getMoveLegality = (
   state: GobanState,
   point: string,
   color: StoneColor
-) => {
-  if (state.gameState.boardState[point] != null) return false;
+): MoveLegality => {
+  if (state.gameState.boardState[point] === "b") return "occupied-black";
+  if (state.gameState.boardState[point] === "w") return "occupied-white";
   const nextState = playMove(state, point, color);
 
   // Self-capture
-  if (!nextState.gameState.boardState[point]) return false;
+  if (!nextState.gameState.boardState[point]) return "suicide";
   // Ko
   const isRepeatPosition = [...nextState.history]
     .reverse()
     .some((historical) =>
       areBoardStatesEqual(historical.boardState, nextState.gameState.boardState)
     );
-  if (isRepeatPosition) return false;
+  if (isRepeatPosition) return "ko";
 
-  return true;
+  return "legal";
 };
 
 export const nextMove = (state: GobanState, variation = 0): GobanState => {
