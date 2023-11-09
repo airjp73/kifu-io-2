@@ -16,5 +16,5 @@ export const loader = async ({ request }: DataFunctionArgs) => {
   const params = new URLSearchParams(url.search);
   const { point } = searchSchema.parse(params);
   await updateRepo(point);
-  return redirect(request.referrer);
+  return redirect("https://github.com/airjp73/readme-test");
 };
