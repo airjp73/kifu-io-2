@@ -53,10 +53,9 @@ export const getCurrentGameState = async () => {
 };
 
 export const commitStateToRepo = async (state: GobanState) => {
-  const newContent = prerenderGoban(state);
-  await updateBoardSvg(newContent);
-  const allLegalMoves = getAllLegalMoves(state);
-  await updateValidMoves(allLegalMoves, state);
-  const sgf = toSgf(denormalizeSgf(state.sgf));
-  await updateSgfFile(sgf);
+  await Promise.all([
+    updateBoardSvg(prerenderGoban(state)),
+    updateValidMoves(getAllLegalMoves(state), state),
+    updateSgfFile(toSgf(denormalizeSgf(state.sgf))),
+  ]);
 };
