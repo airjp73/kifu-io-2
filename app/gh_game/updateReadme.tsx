@@ -101,12 +101,15 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
         </tr>
         <tr>
           <td>⭕️</td>
-          <td>Illegal move due to [Ko](https://senseis.xmp.net/?Ko)</td>
+          <td>
+            Illegal move due to <a href="https://senseis.xmp.net/?Ko">Ko</a>
+          </td>
         </tr>
         <tr>
           <td>💀</td>
           <td>
-            Illegal move due to [self-capture](https://senseis.xmp.net/?Suicide){" "}
+            Illegal move due to{" "}
+            <a href="https://senseis.xmp.net/?Suicide">self-capture</a>
           </td>
         </tr>
       </table>
