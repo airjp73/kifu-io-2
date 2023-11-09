@@ -9,12 +9,13 @@ const searchSchema = zfd.formData({
     .min(2)
     .max(2)
     .regex(/^[a-s]+$/i),
+  stone: z.enum(["b", "w"]).optional(),
 });
 
 export const loader = async ({ request }: DataFunctionArgs) => {
   const url = new URL(request.url);
   const params = new URLSearchParams(url.search);
-  const { point } = searchSchema.parse(params);
-  await updateRepo(point);
+  const { point, stone } = searchSchema.parse(params);
+  await updateRepo(point, stone ?? "b");
   return redirect("https://github.com/airjp73/readme-test");
 };

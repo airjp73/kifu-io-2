@@ -120,14 +120,13 @@ export const updateValidMoves = async (
     }
   };
 
+  const playerToPlay = gobanState.gameState.moveState.playerToPlay ?? "b";
   const playerName = (stoneColor: StoneColor) =>
     stoneColor === "b" ? "⚫️ Black" : "⚪️ White";
 
   const moveList = renderToString(
     <>
-      <p>
-        {playerName(gobanState.gameState.moveState.playerToPlay ?? "b")} to play
-      </p>
+      <p>{playerName(playerToPlay)} to play</p>
       <table>
         <summary>Captures</summary>
         <tr>
@@ -189,7 +188,7 @@ export const updateValidMoves = async (
                     return (
                       <td key={x}>
                         <a
-                          href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}`}
+                          href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}&stone=${playerToPlay}`}
                         >
                           {pointToDisplay(point)}
                         </a>

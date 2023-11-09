@@ -13,13 +13,17 @@ import {
   nextMove,
   playMove,
 } from "~/goban/state/gobanState/updates";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { prerenderGoban } from "./prerender";
 import { getAllLegalMoves } from "./getAllLegalMoves";
 import { denormalizeSgf } from "~/goban/state/sgf";
+import { env } from "~/env";
 
-export const updateRepo = async (move: string) => {
+export const updateRepo = async (move: string, player: string) => {
   let state = await getCurrentGameState();
+  if (state.gameState.moveState.playerToPlay ?? "b" !== player) {
+    throw redirect(`${env.SERVER_LOCATION}/gh_game/race-condition`);
+  }
   const playerToPlay = state.gameState.moveState.playerToPlay ?? "b";
   const legality = getMoveLegality(state, move, playerToPlay);
   if (legality !== "legal") {
