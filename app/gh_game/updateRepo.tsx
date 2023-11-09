@@ -29,21 +29,8 @@ export const updateRepo = async (move: string, player: string) => {
 
   const legality = getMoveLegality(state, move, playerToPlay);
   if (legality !== "legal") {
-    const legalityMessage = () => {
-      switch (legality) {
-        case "ko":
-          return "Ko (or superko) violation";
-        case "occupied-black":
-        case "occupied-white":
-          return "Point is already occupied by a stone";
-        case "suicide":
-          return "Self-capturing move";
-      }
-    };
-
-    throw json(
-      { error: `Illegal move: ${legalityMessage()}` },
-      { status: 400 }
+    throw redirect(
+      `${env.SERVER_LOCATION}/gh_game/illegal?legality=${legality}`
     );
   }
 
