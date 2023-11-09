@@ -1,4 +1,4 @@
-import { redirect, type DataFunctionArgs, json } from "@remix-run/node";
+import { redirect, type DataFunctionArgs } from "@remix-run/node";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { updateRepo } from "~/gh_game/updateRepo";
@@ -12,7 +12,9 @@ const searchSchema = zfd.formData({
 });
 
 export const loader = async ({ request }: DataFunctionArgs) => {
-  const { point } = searchSchema.parse(new URL(request.url).searchParams);
+  const url = new URL(request.url);
+  const params = new URLSearchParams(url.search);
+  const { point } = searchSchema.parse(params);
   await updateRepo(point);
-  return redirect(`/gh_game/images`);
+  return redirect(request.referrer);
 };
