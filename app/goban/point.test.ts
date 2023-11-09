@@ -18,10 +18,10 @@ it("converts coordinates to a point", () => {
 });
 
 it("converts a point to a display string", () => {
-  expect(point.pointToDisplay("ad")).toBe("D1");
-  expect(point.pointToDisplay("bc")).toBe("C2");
-  expect(point.pointToDisplay("cd")).toBe("D3");
-  expect(point.pointToDisplay("de")).toBe("E4");
-  expect(point.pointToDisplay("ef")).toBe("F5");
-  expect(point.pointToDisplay("ek")).toBe("L5");
+  expect(point.pointToDisplay("ad")).toBe("A4");
+  expect(point.pointToDisplay("bc")).toBe("B3");
+  expect(point.pointToDisplay("cd")).toBe("C4");
+  expect(point.pointToDisplay("de")).toBe("D5");
+  expect(point.pointToDisplay("ef")).toBe("E6");
+  expect(point.pointToDisplay("kk")).toBe("L11");
 });

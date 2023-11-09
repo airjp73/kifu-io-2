@@ -4,9 +4,13 @@ import { env } from "~/env";
 import { type GobanState } from "~/goban/state/gobanState/state";
 import type { StoneColor } from "~/goban/state/types";
 import * as d3 from "d3";
-
-const CAP_A = "A".charCodeAt(0);
-const A = "a".charCodeAt(0);
+import type { Point } from "~/goban/point";
+import {
+  coordToDisplayLetter,
+  coordsToPoint,
+  pointToCoords,
+  pointToDisplay,
+} from "~/goban/point";
 
 export function prerenderGoban(state: GobanState) {
   const viewBox = {
@@ -92,7 +96,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {String.fromCharCode(CAP_A + y + (y >= 8 ? 1 : 0))}
+          {y + 1}
         </text>
       ))}
       {eachPoint.map((y) => (
@@ -105,7 +109,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {String.fromCharCode(CAP_A + y + (y >= 8 ? 1 : 0))}
+          {y + 1}
         </text>
       ))}
       {eachPoint.map((x) => (
@@ -118,7 +122,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {x + 1}
+          {coordToDisplayLetter(x)}
         </text>
       ))}
       {eachPoint.map((x) => (
@@ -131,7 +135,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {x + 1}
+          {coordToDisplayLetter(x)}
         </text>
       ))}
       {starPoints.map(([x, y]) => (
@@ -156,16 +160,19 @@ export function prerenderGoban(state: GobanState) {
           <stop offset="100%" stopColor="#000" />
         </linearGradient>
       </defs>
-      {Object.entries(state.gameState.boardState).map(([point, stone]) => (
-        <circle
-          key={point}
-          cx={scale(point.charCodeAt(0) - A + 1)}
-          cy={scale(point.charCodeAt(1) - A + 1)}
-          r={onePoint * 0.45}
-          fill={`url(#${stone === "b" ? "black" : "white"}-gradient)`}
-          style={{ filter: "url(#dropShadow)" }}
-        />
-      ))}
+      {Object.entries(state.gameState.boardState).map(([point, stone]) => {
+        const [x, y] = pointToCoords(point as Point);
+        return (
+          <circle
+            key={point}
+            cx={scale(x + 1)}
+            cy={scale(y + 1)}
+            r={onePoint * 0.45}
+            fill={`url(#${stone === "b" ? "black" : "white"}-gradient)`}
+            style={{ filter: "url(#dropShadow)" }}
+          />
+        );
+      })}
     </svg>
   );
 }
@@ -195,9 +202,8 @@ export function prerenderGobanPiecemeal(state: GobanState) {
             })
               .fill(0)
               .map((_, x) => {
-                const yLetter = String.fromCharCode(y + A + (y >= 8 ? 1 : 0));
-                const point =
-                  String.fromCharCode(x + A) + String.fromCharCode(y + A);
+                const point = coordsToPoint(x, y);
+                const display = pointToDisplay(point);
 
                 return (
                   <Fragment key={x}>
@@ -211,7 +217,7 @@ export function prerenderGobanPiecemeal(state: GobanState) {
                         width={25}
                         height={25}
                         key={x}
-                        alt={`Point ${yLetter}-${x + 1}`}
+                        alt={`Point ${display}`}
                         src={`/svg/${getCacheKey(
                           x,
                           y,

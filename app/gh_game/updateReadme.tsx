@@ -4,6 +4,11 @@ import { octokit } from "./octokit";
 import { renderToString } from "react-dom/server";
 import type { MoveLegality } from "~/goban/state/gobanState/updates";
 import { env } from "~/env";
+import {
+  coordToDisplayLetter,
+  coordsToPoint,
+  pointToDisplay,
+} from "~/goban/point";
 
 export const getGhSgf = async () => {
   const res = await octokit.request(
@@ -62,8 +67,6 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
     "base64"
   ).toString("utf-8");
 
-  const A = "A".charCodeAt(0);
-
   const renderCell = (move: MoveLegality) => {
     switch (move) {
       case "ko":
@@ -113,19 +116,15 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
         <tr>
           <td></td>
           {Array.from({ length: 19 }).map((_, i) => (
-            <td key={i}>{i + 1}</td>
+            <td key={i}>{coordToDisplayLetter(i)}</td>
           ))}
         </tr>
         {moves.map((row, y) => {
-          const letter = String.fromCharCode(y + A + (y >= 8 ? 1 : 0));
           return (
             <tr key={y}>
-              <td>{letter}</td>
+              <td>{y + 1}</td>
               {row.map((move, x) => {
-                const lowerA = "a".charCodeAt(0);
-                const point =
-                  String.fromCharCode(y + lowerA) +
-                  String.fromCharCode(x + lowerA);
+                const point = coordsToPoint(x, y);
                 const content = renderCell(move);
                 if (move === "legal")
                   return (
@@ -133,8 +132,7 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
                       <a
                         href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}`}
                       >
-                        {letter}
-                        {x + 1}
+                        {pointToDisplay(point)}
                       </a>
                     </td>
                   );

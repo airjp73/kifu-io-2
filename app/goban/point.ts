@@ -66,12 +66,12 @@ export const coordsToPoint = (x: number, y: number): Point => {
   return String.fromCharCode(x + L_A, y + L_A) as Point;
 };
 
+export const coordToDisplayLetter = (coord: number): UppercaseLetters =>
+  String.fromCharCode(coord + U_A + (coord >= 8 ? 1 : 0)) as UppercaseLetters;
+
 export function pointToDisplay(point: Point): string;
 export function pointToDisplay(x: number, y: number): string;
 export function pointToDisplay(x: Point | number, y?: number): string {
   const coords = typeof x === "string" ? pointToCoords(x) : [x, y!];
-  return (
-    String.fromCharCode(coords[1] + U_A + (coords[1] >= 8 ? 1 : 0)) +
-    (coords[0] + 1)
-  );
+  return coordToDisplayLetter(coords[0]) + (coords[1] + 1);
 }
