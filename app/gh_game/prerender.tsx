@@ -70,7 +70,7 @@ export function prerenderGoban(state: GobanState) {
           y1={scale(1)}
           y2={scale(19)}
           stroke="#000"
-          strokeWidth={0.3}
+          strokeWidth={0.2}
           strokeLinecap="round"
         />
       ))}
@@ -82,7 +82,7 @@ export function prerenderGoban(state: GobanState) {
           y1={scale(y + 1)}
           y2={scale(y + 1)}
           stroke="#000"
-          strokeWidth={0.3}
+          strokeWidth={0.2}
           strokeLinecap="round"
         />
       ))}
@@ -139,7 +139,7 @@ export function prerenderGoban(state: GobanState) {
         </text>
       ))}
       {starPoints.map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={scale(x)} cy={scale(y)} r={0.75} />
+        <circle key={`${x}-${y}`} cx={scale(x)} cy={scale(y)} r={0.65} />
       ))}
       <defs>
         <filter id="dropShadow">
