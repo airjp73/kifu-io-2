@@ -63,10 +63,10 @@ export function prerenderGoban(state: GobanState) {
       <circle
         cx={scale(x + 1)}
         cy={scale(y + 1)}
-        r={onePoint * 0.3}
+        r={onePoint * 0.25}
         fillOpacity={0}
         stroke={data.B ? "#fff" : "#000"}
-        strokeWidth={0.1}
+        strokeWidth={0.15}
       />
     );
   };
