@@ -1,7 +1,12 @@
 import type { GobanState } from "~/goban/state/gobanState/state";
 import { makeGobanState } from "~/goban/state/gobanState/state";
-import { getGhSgf, updateBoardSvg, updateValidMoves } from "./updateReadme";
-import { parseSgf } from "~/goban/sgf/parse";
+import {
+  getGhSgf,
+  updateBoardSvg,
+  updateSgfFile,
+  updateValidMoves,
+} from "./updateReadme";
+import { parseSgf, toSgf } from "~/goban/sgf/parse";
 import {
   getMoveLegality,
   hasMoreMoves,
@@ -11,6 +16,7 @@ import {
 import { json } from "@remix-run/node";
 import { prerenderGoban } from "./prerender";
 import { getAllLegalMoves } from "./getAllLegalMoves";
+import { denormalizeSgf } from "~/goban/state/sgf";
 
 export const updateRepo = async (move: string) => {
   let state = await getCurrentGameState();
@@ -51,4 +57,6 @@ export const commitStateToRepo = async (state: GobanState) => {
   await updateBoardSvg(newContent);
   const allLegalMoves = getAllLegalMoves(state);
   await updateValidMoves(allLegalMoves);
+  const sgf = toSgf(denormalizeSgf(state.sgf));
+  await updateSgfFile(sgf);
 };

@@ -36,10 +36,39 @@ export const updateBoardSvg = async (svg: string) => {
     `PUT /repos/{owner}/{repo}/contents/{path}`,
     {
       content: Buffer.from(svg).toString("base64"),
-      message: "Test readme update",
+      message: "automated: update board svg",
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: "board.svg",
+      repo: "readme-test",
+      sha: (existingResponse.data as any).sha,
+      branch: "main",
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    }
+  );
+  return res.data;
+};
+
+export const updateSgfFile = async (sgf: string) => {
+  const existingResponse = await octokit.request(
+    `GET /repos/{owner}/{repo}/contents/{path}`,
+    {
+      owner: "airjp73",
+      repo: "readme-test",
+      path: "game.sgf",
+    }
+  );
+
+  const res = await octokit.request(
+    `PUT /repos/{owner}/{repo}/contents/{path}`,
+    {
+      content: Buffer.from(sgf).toString("base64"),
+      message: "automated: update sgf",
+      committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
+      owner: "airjp73",
+      path: "game.sgf",
       repo: "readme-test",
       sha: (existingResponse.data as any).sha,
       branch: "main",
@@ -156,7 +185,7 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
     `PUT /repos/{owner}/{repo}/contents/{path}`,
     {
       content: Buffer.from(nextContent).toString("base64"),
-      message: "Test readme update",
+      message: "automated: update move links in readme",
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: "README.md",
