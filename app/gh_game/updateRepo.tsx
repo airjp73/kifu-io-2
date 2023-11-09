@@ -21,10 +21,12 @@ import { env } from "~/env";
 
 export const updateRepo = async (move: string, player: string) => {
   let state = await getCurrentGameState();
-  if (state.gameState.moveState.playerToPlay ?? "b" !== player) {
+  const playerToPlay = state.gameState.moveState.playerToPlay ?? "b";
+
+  if (playerToPlay !== player) {
     throw redirect(`${env.SERVER_LOCATION}/gh_game/race-condition`);
   }
-  const playerToPlay = state.gameState.moveState.playerToPlay ?? "b";
+
   const legality = getMoveLegality(state, move, playerToPlay);
   if (legality !== "legal") {
     const legalityMessage = () => {
