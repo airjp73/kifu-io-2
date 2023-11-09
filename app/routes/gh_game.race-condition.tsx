@@ -1,11 +1,13 @@
+import { Typography } from "~/ui/typography";
+
 export default function Fail() {
   return (
     <div>
-      <h2>Whoops!</h2>
-      <p>
+      <Typography variant="h2">Whoops!</Typography>
+      <Typography variant="p">
         Looks like someone else played a move at the same time as you and theirs
         went through first.
-      </p>
+      </Typography>
     </div>
   );
 }
