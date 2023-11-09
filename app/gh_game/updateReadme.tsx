@@ -3,6 +3,7 @@ import * as path from "path";
 import { octokit } from "./octokit";
 import { renderToString } from "react-dom/server";
 import type { MoveLegality } from "~/goban/state/gobanState/updates";
+import { env } from "~/env";
 
 export const getGhSgf = async () => {
   const res = await octokit.request(
@@ -121,13 +122,19 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
             <tr key={y}>
               <td>{letter}</td>
               {row.map((move, x) => {
+                const lowerA = "a".charCodeAt(0);
+                const point =
+                  String.fromCharCode(y + lowerA) +
+                  String.fromCharCode(x + lowerA);
                 const content = renderCell(move);
                 if (move === "legal")
                   return (
                     <td key={x}>
-                      <a href={`#${letter}${x}`}>
+                      <a
+                        href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}`}
+                      >
                         {letter}
-                        {x}
+                        {x + 1}
                       </a>
                     </td>
                   );
