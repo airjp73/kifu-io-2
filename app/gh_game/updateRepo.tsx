@@ -56,7 +56,7 @@ export const commitStateToRepo = async (state: GobanState) => {
   const newContent = prerenderGoban(state);
   await updateBoardSvg(newContent);
   const allLegalMoves = getAllLegalMoves(state);
-  await updateValidMoves(allLegalMoves);
+  await updateValidMoves(allLegalMoves, state);
   const sgf = toSgf(denormalizeSgf(state.sgf));
   await updateSgfFile(sgf);
 };

@@ -9,6 +9,8 @@ import {
   coordsToPoint,
   pointToDisplay,
 } from "~/goban/point";
+import type { GobanState } from "~/goban/state/gobanState/state";
+import type { StoneColor } from "~/goban/state/types";
 
 const SGF_FILENAME = "game.sgf";
 
@@ -84,7 +86,10 @@ export const updateSgfFile = async (sgf: string) => {
   return res.data;
 };
 
-export const updateValidMoves = async (moves: MoveLegality[][]) => {
+export const updateValidMoves = async (
+  moves: MoveLegality[][],
+  gobanState: GobanState
+) => {
   const existingResponse = await octokit.request(
     `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
       "README.md"
@@ -115,70 +120,89 @@ export const updateValidMoves = async (moves: MoveLegality[][]) => {
     }
   };
 
-  const moveList = renderToString(
-    <details>
-      <summary>Make a move</summary>
-      <table>
-        <caption>Key</caption>
-        <tr>
-          <td>A1, B2, C3, etc...</td>
-          <td>Valid move (click to make a move)</td>
-        </tr>
-        <tr>
-          <td>⚫️</td>
-          <td>Occupied by Black</td>
-        </tr>
-        <tr>
-          <td>⚪️</td>
-          <td>Occupied by White</td>
-        </tr>
-        <tr>
-          <td>⭕️</td>
-          <td>
-            Illegal move due to <a href="https://senseis.xmp.net/?Ko">Ko</a>
-          </td>
-        </tr>
-        <tr>
-          <td>💀</td>
-          <td>
-            Illegal move due to{" "}
-            <a href="https://senseis.xmp.net/?Suicide">self-capture</a>
-          </td>
-        </tr>
-      </table>
+  const playerName = (stoneColor: StoneColor) =>
+    stoneColor === "b" ? "⚫️ Black" : "⚪️ White";
 
+  const moveList = renderToString(
+    <>
+      <p>
+        {playerName(gobanState.gameState.moveState.playerToPlay ?? "b")} to play
+      </p>
       <table>
-        <caption>Choose a spot to move</caption>
+        <summary>Captures</summary>
         <tr>
-          <td></td>
-          {Array.from({ length: 19 }).map((_, i) => (
-            <td key={i}>{coordToDisplayLetter(i)}</td>
-          ))}
+          <td>{playerName("b")}</td>
+          <td>{gobanState.gameState.captureCounts.b}</td>
         </tr>
-        {moves.map((row, y) => {
-          return (
-            <tr key={y}>
-              <td>{y + 1}</td>
-              {row.map((move, x) => {
-                const point = coordsToPoint(x, y);
-                const content = renderCell(move);
-                if (move === "legal")
-                  return (
-                    <td key={x}>
-                      <a
-                        href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}`}
-                      >
-                        {pointToDisplay(point)}
-                      </a>
-                    </td>
-                  );
-                return <td key={x}>{content}</td>;
-              })}
-            </tr>
-          );
-        })}
+        <tr>
+          <td>{playerName("w")}</td>
+          <td>{gobanState.gameState.captureCounts.w}</td>
+        </tr>
       </table>
-    </details>
+      <details>
+        <summary>Make a move</summary>
+        <table>
+          <caption>Key</caption>
+          <tr>
+            <td>A1, B2, C3, etc...</td>
+            <td>Valid move (click to make a move)</td>
+          </tr>
+          <tr>
+            <td>⚫️</td>
+            <td>Occupied by Black</td>
+          </tr>
+          <tr>
+            <td>⚪️</td>
+            <td>Occupied by White</td>
+          </tr>
+          <tr>
+            <td>⭕️</td>
+            <td>
+              Illegal move due to <a href="https://senseis.xmp.net/?Ko">Ko</a>
+            </td>
+          </tr>
+          <tr>
+            <td>💀</td>
+            <td>
+              Illegal move due to{" "}
+              <a href="https://senseis.xmp.net/?Suicide">self-capture</a>
+            </td>
+          </tr>
+        </table>
+
+        <table>
+          <caption>Choose a spot to move</caption>
+          <tr>
+            <td></td>
+            {Array.from({ length: 19 }).map((_, i) => (
+              <td key={i}>{coordToDisplayLetter(i)}</td>
+            ))}
+          </tr>
+          {moves.map((row, y) => {
+            return (
+              <tr key={y}>
+                <td>{y + 1}</td>
+                {row.map((move, x) => {
+                  const point = coordsToPoint(x, y);
+                  const content = renderCell(move);
+                  if (move === "legal")
+                    return (
+                      <td key={x}>
+                        <a
+                          href={`${env.SERVER_LOCATION}/gh_game/move?point=${point}`}
+                        >
+                          {pointToDisplay(point)}
+                        </a>
+                      </td>
+                    );
+                  return <td key={x}>{content}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </table>
+      </details>
+    </>
   );
 
   const nextContent = existingContent.replace(

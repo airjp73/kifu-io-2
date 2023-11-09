@@ -8,6 +8,7 @@ import type {
   StoneColor,
 } from "../types";
 import { z } from "zod";
+import type { Point } from "~/goban/point";
 
 const onlyOne = <T extends z.ZodSchema<any>>(zod: T) =>
   z
@@ -16,7 +17,10 @@ const onlyOne = <T extends z.ZodSchema<any>>(zod: T) =>
     .max(1)
     .transform((val) => val[0]);
 const singleNumber = onlyOne(z.coerce.number());
-const point = z.string().regex(/^[a-zA-Z]{2}$/i);
+export const PointSchema = z
+  .string()
+  .regex(/^[a-zA-Z]{2}$/i)
+  .transform((val) => val as Point);
 
 export const processMove = (gameState: GameState, node: SgfNodeInfo) => {
   gameState.moveState = {
@@ -55,7 +59,7 @@ const setPoint = (
   value: string[],
   color: StoneColor | null
 ) => {
-  const val = point.safeParse(value[0]);
+  const val = PointSchema.safeParse(value[0]);
   if (val.success) {
     gameState.boardState[val.data] = color;
   } else {
@@ -148,7 +152,7 @@ const setMoveQuality = (
 };
 
 const addMarkup = (points: string[], errors: string[], value: string[]) => {
-  const vals = value.map((v) => point.safeParse(v));
+  const vals = value.map((v) => PointSchema.safeParse(v));
   vals.forEach((val) => {
     if (val.success) {
       points.push(val.data);
@@ -161,8 +165,8 @@ const addMarkup = (points: string[], errors: string[], value: string[]) => {
 const addLines = (gameState: GameState, value: string[]) => {
   value.forEach((val) => {
     const data = val.split(":");
-    const point1 = point.safeParse(data[0]);
-    const point2 = point.safeParse(data[1]);
+    const point1 = PointSchema.safeParse(data[0]);
+    const point2 = PointSchema.safeParse(data[1]);
     if (point1.success && point2.success) {
       gameState.moveState.lines.push([point1.data, point2.data]);
     } else {
@@ -176,7 +180,7 @@ const addLines = (gameState: GameState, value: string[]) => {
 const addLabels = (gameState: GameState, value: string[]) => {
   value.forEach((v) => {
     const data = v.split(":");
-    const pointVal = point.safeParse(data[0]);
+    const pointVal = PointSchema.safeParse(data[0]);
     if (pointVal.success)
       gameState.moveState.labels.push({
         point: pointVal.data,
