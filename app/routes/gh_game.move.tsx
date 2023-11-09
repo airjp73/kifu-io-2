@@ -1,4 +1,4 @@
-import { redirect, type DataFunctionArgs } from "@remix-run/node";
+import { redirect, type DataFunctionArgs, json } from "@remix-run/node";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { updateRepo } from "~/gh_game/updateRepo";
