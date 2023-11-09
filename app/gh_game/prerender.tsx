@@ -11,6 +11,7 @@ import {
   pointToCoords,
   pointToDisplay,
 } from "~/goban/point";
+import { PointSchema } from "~/goban/state/boardState/mutations";
 
 export function prerenderGoban(state: GobanState) {
   const viewBox = {
@@ -51,6 +52,23 @@ export function prerenderGoban(state: GobanState) {
     [16, 10],
     [16, 16],
   ];
+
+  const renderLastPlayedMove = () => {
+    if (!state.currentMove) return null;
+    const data = state.sgf.nodes[state.currentMove].data;
+    const point = (data?.W ?? data?.B)?.[0];
+    if (!point) return null;
+    const [x, y] = pointToCoords(PointSchema.parse(point));
+    return (
+      <circle
+        cx={scale(x + 1)}
+        cy={scale(y + 1)}
+        r={onePoint * 0.3}
+        stroke="white"
+        strokeWidth={0.5}
+      />
+    );
+  };
 
   return renderToString(
     <svg
@@ -141,6 +159,7 @@ export function prerenderGoban(state: GobanState) {
       {starPoints.map(([x, y]) => (
         <circle key={`${x}-${y}`} cx={scale(x)} cy={scale(y)} r={0.65} />
       ))}
+      {renderLastPlayedMove()}
       <defs>
         <filter id="dropShadow">
           <feDropShadow
