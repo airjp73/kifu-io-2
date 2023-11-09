@@ -10,9 +10,13 @@ import {
   pointToDisplay,
 } from "~/goban/point";
 
+const SGF_FILENAME = "game.sgf";
+
 export const getGhSgf = async () => {
   const res = await octokit.request(
-    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent("test.sgf")}`,
+    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
+      SGF_FILENAME
+    )}`,
     {
       headers: {
         accept: "application/vnd.github.v3+json",
@@ -57,7 +61,7 @@ export const updateSgfFile = async (sgf: string) => {
     {
       owner: "airjp73",
       repo: "readme-test",
-      path: "game.sgf",
+      path: SGF_FILENAME,
     }
   );
 
@@ -68,7 +72,7 @@ export const updateSgfFile = async (sgf: string) => {
       message: "automated: update sgf",
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
-      path: "game.sgf",
+      path: SGF_FILENAME,
       repo: "readme-test",
       sha: (existingResponse.data as any).sha,
       branch: "main",
