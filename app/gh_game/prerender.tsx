@@ -159,7 +159,6 @@ export function prerenderGoban(state: GobanState) {
       {starPoints.map(([x, y]) => (
         <circle key={`${x}-${y}`} cx={scale(x)} cy={scale(y)} r={0.65} />
       ))}
-      {renderLastPlayedMove()}
       <defs>
         <filter id="dropShadow">
           <feDropShadow
@@ -192,6 +191,7 @@ export function prerenderGoban(state: GobanState) {
           />
         );
       })}
+      {renderLastPlayedMove()}
     </svg>
   );
 }
