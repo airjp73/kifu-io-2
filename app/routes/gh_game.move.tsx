@@ -2,6 +2,10 @@ import { redirect, type DataFunctionArgs } from "@remix-run/node";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { commitStateToRepo, updateRepoGameState } from "~/gh_game/updateRepo";
+import {
+  addCommentToCurrentMove,
+  setMoveName,
+} from "~/goban/state/gobanState/updates";
 
 const searchSchema = zfd.formData({
   point: z
@@ -16,7 +20,13 @@ export const loader = async ({ request }: DataFunctionArgs) => {
   const url = new URL(request.url);
   const params = new URLSearchParams(url.search);
   const { point, stone } = searchSchema.parse(params);
-  const state = await updateRepoGameState(point, stone ?? "b");
+  let state = await updateRepoGameState(point, stone ?? "b");
+  const now = new Date();
+  state = setMoveName(state, "User move");
+  state = addCommentToCurrentMove(
+    state,
+    `GitHub user on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`
+  );
   await commitStateToRepo(state);
   return redirect("https://github.com/airjp73/readme-test");
 };

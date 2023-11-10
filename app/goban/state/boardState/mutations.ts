@@ -85,11 +85,11 @@ const setPlayerToPlay = (gameState: GameState, color: string[]) => {
     );
   }
 };
-const addComment = (gameState: GameState, comment: string[]) => {
+export const addComment = (gameState: GameState, comment: string[]) => {
   gameState.moveState.comment = comment.join(" ");
 };
 
-const addName = (gameState: GameState, name: string[]) => {
+export const addName = (gameState: GameState, name: string[]) => {
   gameState.moveState.name = name.join(" ");
 };
 

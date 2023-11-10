@@ -3,6 +3,10 @@ import { json } from "@remix-run/node";
 import { z } from "zod";
 import { env } from "~/env";
 import { commitStateToRepo, updateRepoGameState } from "~/gh_game/updateRepo";
+import {
+  addCommentToCurrentMove,
+  setMoveName,
+} from "~/goban/state/gobanState/updates";
 
 const bodySchema = z.object({
   move: z.string(),
@@ -12,7 +16,13 @@ const bodySchema = z.object({
 
 export const action = async ({ request }: DataFunctionArgs) => {
   const { move, stone } = bodySchema.parse(await request.json());
-  const state = await updateRepoGameState(move, stone ?? "b");
+  let state = await updateRepoGameState(move, stone ?? "b");
+  const now = new Date();
+  state = setMoveName(state, "AI move");
+  state = addCommentToCurrentMove(
+    state,
+    `KataGo on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`
+  );
   await commitStateToRepo(state);
   return json({ success: true });
 };

@@ -109,3 +109,30 @@ export const playMove = (
     }),
   };
 };
+
+export const setMoveName = (state: GobanState, comment: string) => {
+  return {
+    ...state,
+    gameState: produce(state.gameState, (draft) =>
+      board.addComment(draft, [comment])
+    ),
+    sgf: produce(state.sgf, (draft) => {
+      draft.nodes[state.currentMove!].data.C = [comment];
+    }),
+  };
+};
+
+export const addCommentToCurrentMove = (
+  state: GobanState,
+  name: string
+): GobanState => {
+  return {
+    ...state,
+    gameState: produce(state.gameState, (draft) =>
+      board.addName(draft, [name])
+    ),
+    sgf: produce(state.sgf, (draft) => {
+      draft.nodes[state.currentMove!].data.N = [name];
+    }),
+  };
+};
