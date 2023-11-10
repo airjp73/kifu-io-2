@@ -1,6 +1,7 @@
 import { redirect, type DataFunctionArgs } from "@remix-run/node";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
+import { env } from "~/env";
 import { commitStateToRepo, updateRepoGameState } from "~/gh_game/updateRepo";
 import {
   addCommentToCurrentMove,
@@ -28,5 +29,5 @@ export const loader = async ({ request }: DataFunctionArgs) => {
     `GitHub user on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`
   );
   await commitStateToRepo(state);
-  return redirect("https://github.com/airjp73/readme-test");
+  return redirect(`https://github.com/airjp73/${env.REPO_NAME}`);
 };

@@ -17,10 +17,11 @@ const SGF_FILENAME = "game.sgf";
 
 const getSgfFile = async (fileName: string) => {
   const res = await octokit.request(
-    `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
-      fileName
-    )}`,
+    `GET /repos/{owner}/{repo}/contents/{fileName}`,
     {
+      owner: "airjp73",
+      repo: env.REPO_NAME,
+      fileName: fileName,
       headers: {
         accept: "application/vnd.github.v3+json",
       },
@@ -114,7 +115,7 @@ export const updateValidMoves = async (
   gobanState: GobanState
 ) => {
   const existingResponse = await octokit.request(
-    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
+    `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
       "README.md"
     )}`,
     {
@@ -252,7 +253,7 @@ export const updateValidMoves = async (
 
 export const updateReadme = async (htmlContent: string) => {
   const existingResponse = await octokit.request(
-    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
+    `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
       "README.md"
     )}`,
     {
