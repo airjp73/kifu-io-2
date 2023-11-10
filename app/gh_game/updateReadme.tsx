@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
 import { octokit } from "./octokit";
 import { renderToString } from "react-dom/server";
 import type { MoveLegality } from "~/goban/state/gobanState/updates";
@@ -13,7 +11,7 @@ import {
 import type { GobanState } from "~/goban/state/gobanState/state";
 import type { StoneColor } from "~/goban/state/types";
 
-const SGF_FILENAME = "game.sgf";
+const SGF_PATH = "current/game.sgf";
 
 const getSgfFile = async (fileName: string) => {
   const res = await octokit.request(
@@ -30,19 +28,10 @@ const getSgfFile = async (fileName: string) => {
   return Buffer.from(res.data.content, "base64").toString("utf-8");
 };
 
-export const getGhSgf = () => getSgfFile(SGF_FILENAME);
+export const getGhSgf = () => getSgfFile(SGF_PATH);
 export const getTemplateSgf = () => getSgfFile("fresh.sgf");
 
-export const updateBoardSvg = async (svg: string) => {
-  const existingResponse = await octokit.request(
-    `GET /repos/{owner}/{repo}/contents/{path}`,
-    {
-      owner: "airjp73",
-      repo: env.REPO_NAME,
-      path: "board.svg",
-    }
-  );
-
+export const updateBoardSvg = async (svg: string, boardId: string) => {
   const res = await octokit.request(
     `PUT /repos/{owner}/{repo}/contents/{path}`,
     {
@@ -50,16 +39,49 @@ export const updateBoardSvg = async (svg: string) => {
       message: "automated: update board svg",
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
-      path: "board.svg",
+      path: `current/board_${boardId}.svg`,
       repo: env.REPO_NAME,
-      sha: (existingResponse.data as any).sha,
       branch: "main",
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     }
   );
+
   return res.data;
+};
+
+export const cleanupOldBoards = async (currentId: string) => {
+  const res = await octokit.request(
+    `GET /repos/{owner}/{repo}/contents/{path}`,
+    {
+      owner: "airjp73",
+      repo: env.REPO_NAME,
+      path: "current",
+    }
+  );
+  if (!Array.isArray(res.data)) {
+    console.error("Expected array of files");
+    return;
+  }
+
+  const toDelete = res.data.filter(
+    (file) => file.name.includes("board") && !file.name.includes(currentId)
+  );
+  toDelete.forEach((file) => {
+    octokit.request(`DELETE /repos/{owner}/{repo}/contents/{path}`, {
+      owner: "airjp73",
+      repo: env.REPO_NAME,
+      path: file.path,
+      message: "automated: delete old board svg",
+      committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
+      sha: file.sha,
+      branch: "main",
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+  });
 };
 
 export const updateSgfFile = async (sgf: string) => {
@@ -68,7 +90,7 @@ export const updateSgfFile = async (sgf: string) => {
     {
       owner: "airjp73",
       repo: env.REPO_NAME,
-      path: SGF_FILENAME,
+      path: SGF_PATH,
     }
   );
 
@@ -79,7 +101,7 @@ export const updateSgfFile = async (sgf: string) => {
       message: "automated: update sgf",
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
-      path: SGF_FILENAME,
+      path: SGF_PATH,
       repo: env.REPO_NAME,
       sha: (existingResponse.data as any).sha,
       branch: "main",
@@ -110,9 +132,10 @@ export const saveToHistory = async (sgf: string) => {
   return res.data;
 };
 
-export const updateValidMoves = async (
+export const updateReadme = async (
   moves: MoveLegality[][],
-  gobanState: GobanState
+  gobanState: GobanState,
+  boardId: string
 ) => {
   const existingResponse = await octokit.request(
     `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
@@ -228,10 +251,12 @@ export const updateValidMoves = async (
     </>
   );
 
-  const nextContent = existingContent.replace(
-    /<!-- MOVES START.+MOVES END -->/s,
-    `<!-- MOVES START -->\n${moveList}\n<!-- MOVES END -->`
-  );
+  const nextContent = existingContent
+    .replace(
+      /<!-- MOVES START.+MOVES END -->/s,
+      `<!-- MOVES START -->\n${moveList}\n<!-- MOVES END -->`
+    )
+    .replace(/".+board.+\.svg"/, `"./current/board_${boardId}.svg"`);
   const res = await octokit.request(
     `PUT /repos/{owner}/{repo}/contents/{path}`,
     {
@@ -249,54 +274,4 @@ export const updateValidMoves = async (
     }
   );
   return res.data;
-};
-
-export const updateReadme = async (htmlContent: string) => {
-  const existingResponse = await octokit.request(
-    `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
-      "README.md"
-    )}`,
-    {
-      headers: {
-        accept: "application/vnd.github.v3+json",
-      },
-    }
-  );
-
-  const existingContent = Buffer.from(
-    existingResponse.data.content,
-    "base64"
-  ).toString("utf-8");
-  const nextContent = existingContent.replace(
-    /<!-- GH GAME START.+GH GAME END -->/s,
-    `<!-- GH GAME START -->\n${htmlContent}\n<!-- GH GAME END -->`
-  );
-  const res = await octokit.request(
-    `PUT /repos/{owner}/{repo}/contents/{path}`,
-    {
-      content: Buffer.from(nextContent).toString("base64"),
-      message: "Test readme update",
-      committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
-      owner: "airjp73",
-      path: "README.md",
-      repo: env.REPO_NAME,
-      sha: existingResponse.data.sha,
-      branch: "main",
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    }
-  );
-  return res.data;
-};
-
-export const updateSvgs = async (svgs: Record<string, string>) => {
-  await Promise.all([
-    Object.entries(svgs).map(([key, svg]) =>
-      fs.promises.writeFile(
-        path.join(__dirname, `../../public/svg/${key}.svg`),
-        svg
-      )
-    ),
-  ]);
 };

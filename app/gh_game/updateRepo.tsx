@@ -4,7 +4,8 @@ import {
   getGhSgf,
   updateBoardSvg,
   updateSgfFile,
-  updateValidMoves,
+  updateReadme,
+  cleanupOldBoards,
 } from "./updateReadme";
 import { parseSgf, toSgf } from "~/goban/sgf/parse";
 import {
@@ -46,9 +47,11 @@ export const getCurrentGameState = async () => {
 };
 
 export const commitStateToRepo = async (state: GobanState) => {
+  const boardId = String(Date.now());
   await Promise.all([
-    updateBoardSvg(prerenderGoban(state)),
-    updateValidMoves(getAllLegalMoves(state), state),
+    updateBoardSvg(prerenderGoban(state), boardId),
+    updateReadme(getAllLegalMoves(state), state, boardId),
     updateSgfFile(toSgf(denormalizeSgf(state.sgf))),
   ]);
+  cleanupOldBoards(boardId);
 };
