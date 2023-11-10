@@ -146,7 +146,7 @@ export const setResult = (state: GobanState, result: string) => {
       board.setProperty(draft, [result], "result")
     ),
     sgf: produce(state.sgf, (draft) => {
-      draft.nodes[state.currentMove!].data.RE = [result];
+      draft.nodes[draft.root[0]].data.RE = [result];
     }),
   };
 };
