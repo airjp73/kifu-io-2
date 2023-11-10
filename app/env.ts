@@ -6,6 +6,7 @@ export const env = createEnv({
     AI_MOVE_SECRET: z.string(),
     GH_API_TOKEN: z.string(),
     SERVER_LOCATION: z.string(),
+    REPO_NAME: z.string(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

@@ -17,7 +17,9 @@ const SGF_FILENAME = "game.sgf";
 
 const getSgfFile = async (fileName: string) => {
   const res = await octokit.request(
-    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(fileName)}`,
+    `GET /repos/airjp73/${env.REPO_NAME}/contents/${encodeURIComponent(
+      fileName
+    )}`,
     {
       headers: {
         accept: "application/vnd.github.v3+json",
@@ -35,7 +37,7 @@ export const updateBoardSvg = async (svg: string) => {
     `GET /repos/{owner}/{repo}/contents/{path}`,
     {
       owner: "airjp73",
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       path: "board.svg",
     }
   );
@@ -48,7 +50,7 @@ export const updateBoardSvg = async (svg: string) => {
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: "board.svg",
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       sha: (existingResponse.data as any).sha,
       branch: "main",
       headers: {
@@ -64,7 +66,7 @@ export const updateSgfFile = async (sgf: string) => {
     `GET /repos/{owner}/{repo}/contents/{path}`,
     {
       owner: "airjp73",
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       path: SGF_FILENAME,
     }
   );
@@ -77,7 +79,7 @@ export const updateSgfFile = async (sgf: string) => {
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: SGF_FILENAME,
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       sha: (existingResponse.data as any).sha,
       branch: "main",
       headers: {
@@ -97,7 +99,7 @@ export const saveToHistory = async (sgf: string) => {
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: `history/${new Date().toISOString()}.sgf`,
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       branch: "main",
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
@@ -237,7 +239,7 @@ export const updateValidMoves = async (
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: "README.md",
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       sha: existingResponse.data.sha,
       branch: "main",
       headers: {
@@ -276,7 +278,7 @@ export const updateReadme = async (htmlContent: string) => {
       committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
       owner: "airjp73",
       path: "README.md",
-      repo: "readme-test",
+      repo: env.REPO_NAME,
       sha: existingResponse.data.sha,
       branch: "main",
       headers: {
