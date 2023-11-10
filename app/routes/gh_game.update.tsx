@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import { z } from "zod";
 import { env } from "~/env";
 import { commitStateToRepo, updateRepoGameState } from "~/gh_game/updateRepo";
+import { displayToPoint } from "~/goban/point";
 import {
   addCommentToCurrentMove,
   setMoveName,
@@ -16,7 +17,7 @@ const bodySchema = z.object({
 
 export const action = async ({ request }: DataFunctionArgs) => {
   const { move, stone } = bodySchema.parse(await request.json());
-  let state = await updateRepoGameState(move, stone ?? "b");
+  let state = await updateRepoGameState(displayToPoint(move), stone ?? "b");
   const now = new Date();
   state = setMoveName(state, "AI move");
   state = addCommentToCurrentMove(

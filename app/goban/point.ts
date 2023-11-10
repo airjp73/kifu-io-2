@@ -75,3 +75,9 @@ export function pointToDisplay(x: Point | number, y?: number): string {
   const coords = typeof x === "string" ? pointToCoords(x) : [x, y!];
   return coordToDisplayLetter(coords[0]) + (coords[1] + 1);
 }
+
+export function displayToPoint(display: string): Point {
+  const x = display.charCodeAt(0) - U_A - (display.charCodeAt(0) >= 73 ? 1 : 0);
+  const y = parseInt(display.slice(1)) - 1;
+  return coordsToPoint(x, y);
+}

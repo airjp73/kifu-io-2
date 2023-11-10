@@ -25,3 +25,12 @@ it("converts a point to a display string", () => {
   expect(point.pointToDisplay("ef")).toBe("E6");
   expect(point.pointToDisplay("kk")).toBe("L11");
 });
+
+it("converts a display string to a point", () => {
+  expect(point.displayToPoint("A4")).toBe("ad");
+  expect(point.displayToPoint("B3")).toBe("bc");
+  expect(point.displayToPoint("C4")).toBe("cd");
+  expect(point.displayToPoint("D5")).toBe("de");
+  expect(point.displayToPoint("E6")).toBe("ef");
+  expect(point.displayToPoint("L11")).toBe("kk");
+});
