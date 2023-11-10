@@ -18,19 +18,20 @@ it("converts coordinates to a point", () => {
 });
 
 it("converts a point to a display string", () => {
-  expect(point.pointToDisplay("ad")).toBe("A4");
-  expect(point.pointToDisplay("bc")).toBe("B3");
-  expect(point.pointToDisplay("cd")).toBe("C4");
-  expect(point.pointToDisplay("de")).toBe("D5");
-  expect(point.pointToDisplay("ef")).toBe("E6");
-  expect(point.pointToDisplay("kk")).toBe("L11");
+  expect(point.pointToDisplay("ad")).toBe("A16");
+  expect(point.pointToDisplay("bc")).toBe("B17");
+  expect(point.pointToDisplay("ba")).toBe("B19");
+  expect(point.pointToDisplay("cd")).toBe("C16");
+  expect(point.pointToDisplay("de")).toBe("D15");
+  expect(point.pointToDisplay("ef")).toBe("E14");
+  expect(point.pointToDisplay("kk")).toBe("L9");
 });
 
 it("converts a display string to a point", () => {
-  expect(point.displayToPoint("A4")).toBe("ad");
-  expect(point.displayToPoint("B3")).toBe("bc");
-  expect(point.displayToPoint("C4")).toBe("cd");
-  expect(point.displayToPoint("D5")).toBe("de");
-  expect(point.displayToPoint("E6")).toBe("ef");
-  expect(point.displayToPoint("L11")).toBe("kk");
+  expect(point.displayToPoint("A4")).toBe("ap");
+  expect(point.displayToPoint("B3")).toBe("bq");
+  expect(point.displayToPoint("C4")).toBe("cp");
+  expect(point.displayToPoint("D5")).toBe("do");
+  expect(point.displayToPoint("E6")).toBe("en");
+  expect(point.displayToPoint("L11")).toBe("ki");
 });

@@ -2,7 +2,11 @@ import { renderToString } from "react-dom/server";
 import { type GobanState } from "~/goban/state/gobanState/state";
 import * as d3 from "d3";
 import type { Point } from "~/goban/point";
-import { coordToDisplayLetter, pointToCoords } from "~/goban/point";
+import {
+  coordToDisplayLetter,
+  coordToYNumber,
+  pointToCoords,
+} from "~/goban/point";
 import { PointSchema } from "~/goban/state/boardState/mutations";
 
 export function prerenderGoban(state: GobanState) {
@@ -107,7 +111,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {y + 1}
+          {coordToYNumber(y)}
         </text>
       ))}
       {eachPoint.map((y) => (
@@ -120,7 +124,7 @@ export function prerenderGoban(state: GobanState) {
           alignmentBaseline="middle"
           fontFamily="sans-serif"
         >
-          {y + 1}
+          {coordToYNumber(y)}
         </text>
       ))}
       {eachPoint.map((x) => (

@@ -6,6 +6,7 @@ import type { MoveLegality } from "~/goban/state/gobanState/updates";
 import { env } from "~/env";
 import {
   coordToDisplayLetter,
+  coordToYNumber,
   coordsToPoint,
   pointToDisplay,
 } from "~/goban/point";
@@ -180,7 +181,7 @@ export const updateValidMoves = async (
           {moves.map((row, y) => {
             return (
               <tr key={y}>
-                <td>{y + 1}</td>
+                <td>{coordToYNumber(y)}</td>
                 {row.map((move, x) => {
                   const point = coordsToPoint(x, y);
                   const content = renderCell(move);
