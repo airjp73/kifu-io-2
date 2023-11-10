@@ -227,7 +227,7 @@ type KeysWithType<Obj, T> = {
   [K in keyof Obj]: Obj[K] extends T ? K : never;
 }[keyof Obj];
 
-const setProperty = (
+export const setProperty = (
   gameState: GameState,
   value: string[],
   propertyName: KeysWithType<Required<GameState["properties"]>, string>

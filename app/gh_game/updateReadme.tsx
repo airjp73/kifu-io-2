@@ -15,11 +15,9 @@ import type { StoneColor } from "~/goban/state/types";
 
 const SGF_FILENAME = "game.sgf";
 
-export const getGhSgf = async () => {
+const getSgfFile = async (fileName: string) => {
   const res = await octokit.request(
-    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(
-      SGF_FILENAME
-    )}`,
+    `GET /repos/airjp73/readme-test/contents/${encodeURIComponent(fileName)}`,
     {
       headers: {
         accept: "application/vnd.github.v3+json",
@@ -28,6 +26,9 @@ export const getGhSgf = async () => {
   );
   return Buffer.from(res.data.content, "base64").toString("utf-8");
 };
+
+export const getGhSgf = () => getSgfFile(SGF_FILENAME);
+export const getTemplateSgf = () => getSgfFile("fresh.sgf");
 
 export const updateBoardSvg = async (svg: string) => {
   const existingResponse = await octokit.request(
@@ -78,6 +79,25 @@ export const updateSgfFile = async (sgf: string) => {
       path: SGF_FILENAME,
       repo: "readme-test",
       sha: (existingResponse.data as any).sha,
+      branch: "main",
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    }
+  );
+  return res.data;
+};
+
+export const saveToHistory = async (sgf: string) => {
+  const res = await octokit.request(
+    `PUT /repos/{owner}/{repo}/contents/{path}`,
+    {
+      content: Buffer.from(sgf).toString("base64"),
+      message: "automated: save historical sgf",
+      committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
+      owner: "airjp73",
+      path: `history/${new Date().toISOString()}.sgf`,
+      repo: "readme-test",
       branch: "main",
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",

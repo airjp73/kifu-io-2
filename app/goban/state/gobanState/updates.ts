@@ -88,10 +88,11 @@ export const playMove = (
   color: StoneColor
 ): GobanState => {
   const nextId = Math.max(...Object.keys(state.sgf.nodes).map(Number)) + 1;
+  const value = point === "pass" ? [] : [point];
   const nextNode: NormalizedSgfNode = {
     id: nextId,
     children: [],
-    data: color === "b" ? { B: [point] } : { W: [point] },
+    data: color === "b" ? { B: value } : { W: value },
     parentId: state.currentMove,
   };
 
@@ -134,6 +135,18 @@ export const addCommentToCurrentMove = (
     ),
     sgf: produce(state.sgf, (draft) => {
       draft.nodes[state.currentMove!].data.N = [name];
+    }),
+  };
+};
+
+export const setResult = (state: GobanState, result: string) => {
+  return {
+    ...state,
+    gameState: produce(state.gameState, (draft) =>
+      board.setProperty(draft, [result], "result")
+    ),
+    sgf: produce(state.sgf, (draft) => {
+      draft.nodes[state.currentMove!].data.RE = [result];
     }),
   };
 };
