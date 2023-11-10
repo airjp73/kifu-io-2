@@ -29,5 +29,9 @@ export const loader = async ({ request }: DataFunctionArgs) => {
     `GitHub user on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`
   );
   await commitStateToRepo(state);
-  return redirect(`https://github.com/airjp73/${env.REPO_NAME}`);
+  const target =
+    env.REPO_NAME === "airjp73"
+      ? `https://github.com/airjp73`
+      : `https://github.com/airjp73/${env.REPO_NAME}`;
+  return redirect(target);
 };
