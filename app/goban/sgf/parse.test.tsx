@@ -21,6 +21,7 @@ const allSnapshots = [
   snapshot7,
   snapshot8,
   "(;GM[1]FF[4]CA[UTF-8]AP[Kifu.io]ST[2]RU[Tromp-Taylor]SZ[19]KM[6.50])",
+  "(;GM[1]FF[4]CA[UTF-8]AP[Kifu.io]ST[2]RU[Tromp-Taylor]SZ[19]KM[6.50];B[];W[])",
 ];
 
 describe("parse", () => {

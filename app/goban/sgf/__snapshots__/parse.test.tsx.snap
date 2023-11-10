@@ -1602,3 +1602,9 @@ houth [1k\\\\]: gg
 `;
 
 exports[`parse > should parse and format 11`] = `"(;GM[1]FF[4]CA[UTF-8]AP[Kifu.io]ST[2]RU[Tromp-Taylor]SZ[19]KM[6.50])"`;
+
+exports[`parse > should parse and format 12`] = `
+"(;GM[1]FF[4]CA[UTF-8]AP[Kifu.io]ST[2]RU[Tromp-Taylor]SZ[19]KM[6.50]
+;B[]
+;W[])"
+`;
