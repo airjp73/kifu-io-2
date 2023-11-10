@@ -13,13 +13,13 @@ import {
   nextMove,
   playMove,
 } from "~/goban/state/gobanState/updates";
-import { json, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { prerenderGoban } from "./prerender";
 import { getAllLegalMoves } from "./getAllLegalMoves";
 import { denormalizeSgf } from "~/goban/state/sgf";
 import { env } from "~/env";
 
-export const updateRepo = async (move: string, player: string) => {
+export const updateRepoGameState = async (move: string, player: string) => {
   let state = await getCurrentGameState();
   const playerToPlay = state.gameState.moveState.playerToPlay ?? "b";
 
@@ -35,7 +35,7 @@ export const updateRepo = async (move: string, player: string) => {
   }
 
   state = playMove(state, move, playerToPlay);
-  await commitStateToRepo(state);
+  return state;
 };
 
 export const getCurrentGameState = async () => {

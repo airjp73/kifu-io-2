@@ -2,7 +2,7 @@ import type { DataFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { z } from "zod";
 import { env } from "~/env";
-import { updateRepo } from "~/gh_game/updateRepo";
+import { commitStateToRepo, updateRepoGameState } from "~/gh_game/updateRepo";
 
 const bodySchema = z.object({
   move: z.string(),
@@ -12,6 +12,7 @@ const bodySchema = z.object({
 
 export const action = async ({ request }: DataFunctionArgs) => {
   const { move, stone } = bodySchema.parse(await request.json());
-  await updateRepo(move, stone ?? "b");
+  const state = await updateRepoGameState(move, stone ?? "b");
+  await commitStateToRepo(state);
   return json({ success: true });
 };
