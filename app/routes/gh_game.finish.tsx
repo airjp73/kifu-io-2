@@ -32,12 +32,9 @@ export const action = async ({ request }: DataFunctionArgs) => {
       "pass",
       state.gameState.moveState.playerToPlay ?? "b"
     );
-    state = setResult(state, result);
   }
 
-  if (reason === "resign") {
-    throw new Error("TODO: not implemented");
-  }
+  state = setResult(state, result);
 
   await saveToHistory(toSgf(denormalizeSgf(state.sgf)));
   const frehSgf = makeGobanState(parseSgf(await freshPromise));
