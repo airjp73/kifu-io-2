@@ -6,7 +6,8 @@ import type { NormalizedSgfNode } from "../sgf";
 
 export const hasMoreMoves = (state: GobanState) => {
   return (
-    !state.currentMove || state.sgf.nodes[state.currentMove].children.length > 0
+    state.currentMove == null ||
+    state.sgf.nodes[state.currentMove].children.length > 0
   );
 };
 
