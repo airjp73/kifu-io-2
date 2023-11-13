@@ -56,11 +56,13 @@ export const commitStateToRepo = async (state: GobanState) => {
       console.log(`Board with id ${boardId} successfully created.`)
     ),
     updateReadme(getAllLegalMoves(state), state, boardId).then(() =>
-      console.log(`Readmen successfully updated.`)
+      console.log(`Readme successfully updated.`)
     ),
     updateSgfFile(toSgf(denormalizeSgf(state.sgf))).then(() =>
       console.log("SGF successfully updated.")
     ),
+    cleanupOldBoards(boardId).then(() =>
+      console.log("Old boards successfully cleaned up.")
+    ),
   ]);
-  cleanupOldBoards(boardId);
 };
