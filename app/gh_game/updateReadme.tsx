@@ -74,28 +74,30 @@ export const cleanupOldBoards = async (currentId: string) => {
 
   console.log(`Found ${toDelete.length} old board files to delete`);
 
-  toDelete.forEach((file) => {
-    octokit
-      .request(`DELETE /repos/{owner}/{repo}/contents/{path}`, {
-        owner: "airjp73",
-        repo: env.REPO_NAME,
-        path: file.path,
-        message: "automated: delete old board svg",
-        committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
-        sha: file.sha,
-        branch: "main",
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      })
-      .then(() => console.log(`Successfully deleted ${file.name}`))
-      .catch((err) =>
-        console.error(
-          `Failed to delete ${file.name}. Error: `,
-          err.message ?? `Unknown error`
+  await Promise.all(
+    toDelete.map((file) =>
+      octokit
+        .request(`DELETE /repos/{owner}/{repo}/contents/{path}`, {
+          owner: "airjp73",
+          repo: env.REPO_NAME,
+          path: file.path,
+          message: "automated: delete old board svg",
+          committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
+          sha: file.sha,
+          branch: "main",
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        })
+        .then(() => console.log(`Successfully deleted ${file.name}`))
+        .catch((err) =>
+          console.error(
+            `Failed to delete ${file.name}. Error: `,
+            err.message ?? `Unknown error`
+          )
         )
-      );
-  });
+    )
+  );
 };
 
 export const updateSgfFile = async (sgf: string) => {
