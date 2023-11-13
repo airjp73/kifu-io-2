@@ -52,6 +52,7 @@ export const updateBoardSvg = async (svg: string, boardId: string) => {
 };
 
 export const cleanupOldBoards = async (currentId: string) => {
+  console.log("Checking for old boards");
   const res = await octokit.request(
     `GET /repos/{owner}/{repo}/contents/{path}`,
     {
@@ -65,22 +66,35 @@ export const cleanupOldBoards = async (currentId: string) => {
     return;
   }
 
+  console.log(`Found ${res.data.length} board files in current directory`);
+
   const toDelete = res.data.filter(
     (file) => file.name.includes("board") && !file.name.includes(currentId)
   );
+
+  console.log(`Found ${toDelete.length} old board files to delete`);
+
   toDelete.forEach((file) => {
-    octokit.request(`DELETE /repos/{owner}/{repo}/contents/{path}`, {
-      owner: "airjp73",
-      repo: env.REPO_NAME,
-      path: file.path,
-      message: "automated: delete old board svg",
-      committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
-      sha: file.sha,
-      branch: "main",
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
+    octokit
+      .request(`DELETE /repos/{owner}/{repo}/contents/{path}`, {
+        owner: "airjp73",
+        repo: env.REPO_NAME,
+        path: file.path,
+        message: "automated: delete old board svg",
+        committer: { name: "Kifu.io", email: "pettengill.aaron@gmail.com" },
+        sha: file.sha,
+        branch: "main",
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      })
+      .then(() => console.log(`Successfully deleted ${file.name}`))
+      .catch((err) =>
+        console.error(
+          `Failed to delete ${file.name}. Error: `,
+          err.message ?? `Unknown error`
+        )
+      );
   });
 };
 

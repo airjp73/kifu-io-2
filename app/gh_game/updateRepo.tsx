@@ -43,15 +43,24 @@ export const getCurrentGameState = async () => {
   const sgf = await getGhSgf();
   let state = makeGobanState(parseSgf(sgf));
   while (hasMoreMoves(state)) state = nextMove(state);
+  console.log(
+    `Received SGF with ${Object.keys(state.sgf.nodes).length} nodes.`
+  );
   return state;
 };
 
 export const commitStateToRepo = async (state: GobanState) => {
   const boardId = String(Date.now());
   await Promise.all([
-    updateBoardSvg(prerenderGoban(state), boardId),
-    updateReadme(getAllLegalMoves(state), state, boardId),
-    updateSgfFile(toSgf(denormalizeSgf(state.sgf))),
+    updateBoardSvg(prerenderGoban(state), boardId).then(() =>
+      console.log(`Board with id ${boardId} successfully created.`)
+    ),
+    updateReadme(getAllLegalMoves(state), state, boardId).then(() =>
+      console.log(`Readmen successfully updated.`)
+    ),
+    updateSgfFile(toSgf(denormalizeSgf(state.sgf))).then(() =>
+      console.log("SGF successfully updated.")
+    ),
   ]);
   cleanupOldBoards(boardId);
 };
