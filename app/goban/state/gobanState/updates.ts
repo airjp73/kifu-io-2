@@ -119,7 +119,7 @@ export const setMoveName = (state: GobanState, comment: string) => {
       board.addComment(draft, [comment])
     ),
     sgf: produce(state.sgf, (draft) => {
-      draft.nodes[state.currentMove!].data.C = [comment];
+      draft.nodes[state.currentMove!].data.N = [comment];
     }),
   };
 };
@@ -134,7 +134,7 @@ export const addCommentToCurrentMove = (
       board.addName(draft, [name])
     ),
     sgf: produce(state.sgf, (draft) => {
-      draft.nodes[state.currentMove!].data.N = [name];
+      draft.nodes[state.currentMove!].data.C = [name];
     }),
   };
 };
